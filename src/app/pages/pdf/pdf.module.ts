@@ -4,6 +4,7 @@ import { PdfComponent } from './pdf.component';
 import {PdfRoutingModule} from './pdf-routing.module';
 import {LibraryModule} from '../../library.module';
 import {FormsModule} from '@angular/forms';
+import { PdfKeywordPipe } from './pdf-keyword.pipe';
 
 
 
@@ -14,7 +15,7 @@ import {FormsModule} from '@angular/forms';
     LibraryModule,
     FormsModule
   ],
-  declarations: [ PdfComponent ],
+  declarations: [ PdfComponent, PdfKeywordPipe ],
   exports: []
 })
 export class PdfModule { }

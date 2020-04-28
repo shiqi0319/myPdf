@@ -1,26 +1,58 @@
-<div>
-  <div class="pdf-search">
-    PDF <input nz-input placeholder="Basic usage" [(ngModel)]="value" /> <button nz-button nzType="primary">Search</button>
+<div class="box">
+  <div class="pdf-search p-b-10">
+    <span class="m-r-10">PDF</span>
+    <input class="input-width m-r-10" nz-input placeholder="Basic usage" [(ngModel)]="keywordValue" />
+    <button nz-button nzType="primary" class="m-r-10" (click)="searchPdfKeyword()">Search</button>
+    <button nz-button nzType="primary" (click)="open()">Open</button>
   </div>
 
   <div class="pdf">
     <div class="pdf-left">
-      <nz-collapse>
+      <nz-collapse *ngIf="pdfSearchResult?.length > 0">
         <nz-collapse-panel
-          *ngFor="let panel of panels"
-          [nzHeader]="panel.name"
-          [nzActive]="panel.active"
-          [nzDisabled]="panel.disabled"
-        >
-          <p style="margin:0;">
-            A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a welcome
-            guest in many households across the world.
-          </p>
+          *ngFor="let item of pdfSearchResult; index as index"
+          [nzHeader]="pdfSearchHeader"
+          [nzActive]="item.active">
+          <ng-template #pdfSearchHeader>
+            Name:{{ item.pageName }} {{item.matchesCountTotal}}
+          </ng-template>
+          <div *ngFor="let page of item.matches; index as pageIdx">
+            <ng-container *ngIf="page?.length > 0">
+              Page: {{pageIdx + 1}}
+              <div class="details-list cursor" *ngFor="let pageDetails of page"
+                   (click)="openPdfPageIndex(index, pageIdx)">
+                <span [innerHTML]="pageDetails.data | pdfKeyword: keywordValue"></span>
+              </div>
+            </ng-container>
+          </div>
         </nz-collapse-panel>
       </nz-collapse>
     </div>
     <div class="pdf-right">
-      
+      <nz-radio-group [(ngModel)]="radioValue" [nzButtonStyle]="'solid'">
+        <label *ngFor="let item of addPdfList"
+               nz-radio-button nzValue="{{item.id}}"
+               (click)="selectPdf(item)">{{item.name}}</label>
+      </nz-radio-group>
+      <ng-container *ngFor="let item of addPdfList">
+        <iframe class="pdf-details"
+                [ngClass]="{ zIndexMax: item.isShow }"
+                [src]="sanitizer.bypassSecurityTrustResourceUrl('./../../../assets/js/web/viewer.html?file=' + item.url + '#page=' + item.pageIndex)"
+                frameborder="0">
+        </iframe>
+      </ng-container>
     </div>
   </div>
 </div>
+
+
+<nz-drawer
+  [nzClosable]="false"
+  [nzVisible]="visible"
+  nzPlacement="right"
+  nzTitle="Basic Drawer"
+  (nzOnClose)="close()">
+  <div *ngFor="let item of pdfList" class="p-b-10">
+    {{item.name}} <span class="cursor pull-right" (click)="add(item)">add</span>
+  </div>
+</nz-drawer>
